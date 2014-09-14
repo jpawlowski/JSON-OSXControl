@@ -39,23 +39,23 @@ $app = array(
     'restart' => array(
       'description' => "Restart Mac",
       'appleScript' => "restart",
-      'result' => "array",
+      'result' => "bool",
     ),
 
     'sleep' => array(
       'description' => "Set Mac to sleep",
       'appleScript' => "sleep",
-      'result' => "array",
+      'result' => "bool",
     ),
 
     'shutdown' => array(
       'description' => "Shutdown Mac",
-      'appleScript' => "system info",
-      'result' => "array",
+      'appleScript' => "shutdown",
+      'result' => "bool",
     ),
 
-    'status' => array(
-      'description' => "Gets overall status",
+    'getStatus' => array(
+      'description' => "Gets overall system status",
       'appleScript' => "system info",
       'result' => "array",
     ),

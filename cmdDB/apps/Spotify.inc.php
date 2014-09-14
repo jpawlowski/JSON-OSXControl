@@ -93,6 +93,45 @@ $app = array(
       'result' => "bool",
     ),
 
+    "setPlayerPosition" => array(
+      'description' => "jump to a specific time index of current song",
+      'appleScript' => "set player position to",
+      'arguments' => array(
+        '1' => array(
+          'description' => "time index",
+          'type' => "integer",
+          'required' => true,
+        ),
+      ),
+      'result' => "bool",
+    ),
+
+    "setRepeating" => array(
+      'description' => "control repeating",
+      'appleScript' => "set repeating to",
+      'arguments' => array(
+        '1' => array(
+          'description' => "turn repeating on or off",
+          'type' => "bool",
+          'required' => true,
+        ),
+      ),
+      'result' => "bool",
+    ),
+
+    "setShuffling" => array(
+      'description' => "control shuffling",
+      'appleScript' => "set shuffling to",
+      'arguments' => array(
+        '1' => array(
+          'description' => "turn repeating on or off",
+          'type' => "bool",
+          'required' => true,
+        ),
+      ),
+      'result' => "bool",
+    ),
+
     "nextTrack" => array(
       'description' => "advance to the next track in the current playlist",
       'appleScript' => "next track",
