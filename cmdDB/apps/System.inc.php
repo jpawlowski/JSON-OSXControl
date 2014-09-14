@@ -84,7 +84,7 @@ $app = array(
       'arguments' => array(
         '1' => array(
           'description' => "Volume in percent",
-          'type' => "string",
+          'type' => "integer",
           'required' => true,
         ),
       ),
@@ -163,6 +163,36 @@ $app = array(
           'type' => "string",
           'required' => false,
           'appleScript' => " using \"%ARG2%\"",
+        ),
+        '3' => array(
+          'description' => "speaking rate",
+          'type' => "integer",
+          'required' => false,
+          'appleScript' => " speaking rate \"%ARG3%\"",
+        ),
+        '4' => array(
+          'description' => "pitch",
+          'type' => "integer",
+          'required' => false,
+          'appleScript' => " pitch \"%ARG4%\"",
+        ),
+        '5' => array(
+          'description' => "modulation",
+          'type' => "integer",
+          'required' => false,
+          'appleScript' => " modulation \"%ARG5%\"",
+        ),
+        '6' => array(
+          'description' => "volume",
+          'type' => "integer",
+          'required' => false,
+          'appleScript' => " volume \"%ARG6%\"",
+        ),
+        '7' => array(
+          'description' => "stopping current speech",
+          'type' => "bool",
+          'required' => false,
+          'appleScript' => " with stopping current speech",
         ),
       ),
       'result' => "array",

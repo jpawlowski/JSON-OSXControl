@@ -197,7 +197,7 @@ function appControl()
 
     if ($resultCode > 0) {
       $result = "OSASCRIPT_ERROR";
-      $msg = $osaCmd." -> ".$resultText[0];
+      $msg = $osaCmd;
       $value = false;
     } else {
       $result = "SUCCESS";
@@ -226,7 +226,7 @@ function appControl()
               $lineValue = null;
             }
 
-            if ($lineKey != "class") {
+            if (!empty($lineKey) AND $lineKey != "class") {
               $converted[$lineKey] = $lineValue;
             }
           }
@@ -234,7 +234,11 @@ function appControl()
           $converted = $resultText;
         }
 
-        $value = $converted;
+        if (empty($converted)) {
+          $value = true;
+        } else {
+          $value = $converted;
+        }
       } else {
         $value = true;
       }
