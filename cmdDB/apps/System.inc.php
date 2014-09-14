@@ -60,5 +60,18 @@ $app = array(
       'result' => "array",
     ),
 
+    'displayDialog' => array(
+      'description' => "Displays system dialog message",
+      'appleScript' => "display dialog",
+      'arguments' => array(
+        '1' => array(
+          'description' => "Message text",
+          'type' => "string",
+          'required' => true,
+        ),
+      ),
+      'result' => "array",
+    ),
+
   ),
 );

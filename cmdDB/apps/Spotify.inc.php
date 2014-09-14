@@ -1,7 +1,7 @@
 <?php
 /*****************************************************************************
 *
-*     iTunes.inc.php
+*     Spotify.inc.php
 *     Apple Script definition file for OSXControl
 *
 *     Copyright by Julian Pawlowski
@@ -32,16 +32,14 @@
 *****************************************************************************/
 
 $app = array(
-  'name' => "iTunes",
-  'description' => "controls iTunes application",
+  'name' => "Spotify",
+  'description' => "controls Spotify music application",
   'commands' => array(
 
     'getStatus' => array(
       'description' => "Gets overall status",
       'appleScript' => array(
-        'if (number of track > 0 and number of artwork of current track > 0) then',
-        'properties & properties of current track & properties of artwork 1 of current track',
-        'else if (number of track > 0) then',
+        'if ((current track) is not "missing value") then',
         'properties & properties of current track',
         'else',
         'properties',
@@ -50,10 +48,22 @@ $app = array(
       'result' => "array",
     ),
 
+    'getVersion' => array(
+      'description' => "Version of this application",
+      'appleScript' => 'version',
+      'result' => "string",
+    ),
+
+    'getFrontmost' => array(
+      'description' => "Frontmost/active application",
+      'appleScript' => 'frontmost',
+      'result' => "string",
+    ),
+
     'getCurrentTrack' => array(
       'description' => "Gets current track information",
       'appleScript' => array(
-        'if (number of track > 0 ) then',
+        'if ((current track) is not "missing value") then',
         'properties of current track',
         'end if',
       ),
@@ -63,22 +73,23 @@ $app = array(
     'getCurrentArtwork' => array(
       'description' => "Gets current track artwork information",
       'appleScript' => array(
-        'if (number of track > 0 and number of artwork of current track > 0) then',
-        'properties of artwork 1 of current track',
+        'if ((current track) is not "missing value") then',
+        'artwork of current track',
         'end if',
       ),
       'result' => "array",
     ),
 
-    "backTrack" => array(
-      'description' => "reposition to beginning of current track or go to previous track if already at start of current track",
-      'appleScript' => "back track",
-      'result' => "bool",
-    ),
-
-    "fastForward" => array(
-      'description' => "skip forward in a playing track",
-      'appleScript' => "fast forward",
+    "setPlayTrack" => array(
+      'description' => "play a specific track",
+      'appleScript' => "play track",
+      'arguments' => array(
+        '1' => array(
+          'description' => "Track address",
+          'type' => "string",
+          'required' => true,
+        ),
+      ),
       'result' => "bool",
     ),
 
@@ -112,30 +123,6 @@ $app = array(
       'result' => "bool",
     ),
 
-    "resume" => array(
-      'description' => "disable fast forward/rewind and resume playback, if playing.",
-      'appleScript' => "resume",
-      'result' => "bool",
-    ),
-
-    "rewind" => array(
-      'description' => "skip backwards in a playing track",
-      'appleScript' => "rewind",
-      'result' => "bool",
-    ),
-
-    "stop" => array(
-      'description' => "stop playback",
-      'appleScript' => "stop",
-      'result' => "bool",
-    ),
-
-    "updateAllPodcasts" => array(
-      'description' => "update all subscribed podcast feeds",
-      'appleScript' => "updateAllPodcasts",
-      'result' => "bool",
-    ),
-
     "setVolume" => array(
       'description' => "Set volume tp specific level",
       'appleScript' => "set sound volume to",
@@ -158,18 +145,6 @@ $app = array(
     "volumeDown" => array(
       'description' => "Turn volume down by 5%",
       'appleScript' => "set sound volume to sound volume - 5",
-      'result' => "bool",
-    ),
-
-    "mute" => array(
-      'description' => "Mute audio",
-      'appleScript' => "set mute to yes",
-      'result' => "bool",
-    ),
-
-    "unmute" => array(
-      'description' => "Unmute audio",
-      'appleScript' => "set mute to no",
       'result' => "bool",
     ),
 

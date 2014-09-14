@@ -106,31 +106,35 @@ function appControl()
       $result = "SUCCESS";
       $msg = null;
 
-      if ($cmd['result'] == "array") {
+      if ($cmd['result'] == "array" OR $cmd['result'] == "string") {
         # special handling for date fields
         $resultText = preg_replace("/:(date\ )([A-Z]\w+)(,\ )([0-9]+\.\ )/", ":$2\\,,$4", $resultText[0]);
 
         # special handling for data fields
         $resultText = preg_replace("/(«data )(.*)(»)/", "$2", $resultText);
 
-        # create Array
-        $resArray = explode(', ', $resultText);
+        if ($cmd['result'] == "array") {
+          # create Array
+          $resArray = explode(', ', $resultText);
 
-        foreach ($resArray as $key => $line) {
-          $lineKey = preg_replace("/(.*?):(.*)/", "$1", $line);
-          $lineValue = preg_replace("/(.*?):(.*)/", "$2", $line);
+          foreach ($resArray as $key => $line) {
+            $lineKey = preg_replace("/(.*?):(.*)/", "$1", $line);
+            $lineValue = preg_replace("/(.*?):(.*)/", "$2", $line);
 
-          # correct date fields
-          $lineValue = preg_replace("/(\\\,,)/", ", ", $lineValue);
+            # correct date fields
+            $lineValue = preg_replace("/(\\\,,)/", ", ", $lineValue);
 
-          # handle missing values as being nil
-          if ($lineValue == "missing value") {
-            $lineValue = null;
+            # handle missing values as being nil
+            if ($lineValue == "missing value") {
+              $lineValue = null;
+            }
+
+            if ($lineKey != "class") {
+              $converted[$lineKey] = $lineValue;
+            }
           }
-
-          if ($lineKey != "class" AND $lineKey != "name") {
-            $converted[$lineKey] = $lineValue;
-          }
+        } else {
+          $converted = $resultText;
         }
 
         $value = $converted;
