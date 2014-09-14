@@ -138,7 +138,7 @@ $app = array(
 
     "setVolume" => array(
       'description' => "Set volume tp specific level",
-      'appleScript' => "set sound volume to",
+      'appleScript' => "set sound volume to %ARG1%",
       'arguments' => array(
         '1' => array(
           'description' => "Volume in percent",

@@ -56,6 +56,12 @@ $generic = array(
     'result' => "bool",
   ),
 
+  'close' => array(
+    'description' => "Closes every application window",
+    'appleScript' => 'close every window',
+    'result' => "bool",
+  ),
+
   'quit' => array(
     'description' => "Quits the Application",
     'appleScript' => 'quit',
@@ -65,6 +71,45 @@ $generic = array(
   'activate' => array(
     'description' => "Activates the Application",
     'appleScript' => 'activate',
+    'result' => "bool",
+  ),
+
+  'keystroke' => array(
+    'description' => "cause the target process to behave as if keystrokes were entered",
+    'appleScript' => "keystroke %ARG1%",
+    'arguments' => array(
+      '1' => array(
+        'description' => "The keystrokes to be sent.",
+        'type' => "string",
+        'required' => true,
+      ),
+    ),
+    'result' => "bool",
+  ),
+
+  'perform' => array(
+    'description' => "cause the target process to behave as if the action were applied to its UI element",
+    'appleScript' => "perform %ARG1%",
+    'arguments' => array(
+      '1' => array(
+        'description' => "The action to be performed.",
+        'type' => "string",
+        'required' => true,
+      ),
+    ),
+    'result' => "bool",
+  ),
+
+  'select' => array(
+    'description' => "set the selected property of the UI element",
+    'appleScript' => "select %ARG1%",
+    'arguments' => array(
+      '1' => array(
+        'description' => "The UI element to be selected.",
+        'type' => "string",
+        'required' => true,
+      ),
+    ),
     'result' => "bool",
   ),
 

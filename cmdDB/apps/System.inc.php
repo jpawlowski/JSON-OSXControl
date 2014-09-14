@@ -66,6 +66,43 @@ $app = array(
       'result' => "array",
     ),
 
+    "mute" => array(
+      'description' => "Mute system audio",
+      'appleScript' => "set volume with output muted",
+      'result' => "bool",
+    ),
+
+    "unmute" => array(
+      'description' => "Unmute system audio",
+      'appleScript' => "set volume without output muted",
+      'result' => "bool",
+    ),
+
+    "setVolume" => array(
+      'description' => "Set volume tp specific level",
+      'appleScript' => "set volume output volume %ARG1% --100%",
+      'arguments' => array(
+        '1' => array(
+          'description' => "Volume in percent",
+          'type' => "string",
+          'required' => true,
+        ),
+      ),
+      'result' => "bool",
+    ),
+
+    "volumeUp" => array(
+      'description' => "Turn volume up by 5%",
+      'appleScript' => "set volume output volume (output volume of (get volume settings) + 5) --100%",
+      'result' => "bool",
+    ),
+
+    "volumeDown" => array(
+      'description' => "Turn volume down by 5%",
+      'appleScript' => "set volume output volume (output volume of (get volume settings) - 5) --100%",
+      'result' => "bool",
+    ),
+
     'displayDialog' => array(
       'description' => "Displays system dialog message",
       'appleScript' => "display dialog \"%ARG1%\"",
