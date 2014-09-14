@@ -148,5 +148,25 @@ $app = array(
       'result' => "array",
     ),
 
+    'say' => array(
+      'description' => "Speak message",
+      'appleScript' => "say",
+      'arguments' => array(
+        '1' => array(
+          'description' => "Message text",
+          'type' => "string",
+          'required' => true,
+          'appleScript' => " \"%ARG1%\"",
+        ),
+        '2' => array(
+          'description' => "voice name",
+          'type' => "string",
+          'required' => false,
+          'appleScript' => " using \"%ARG2%\"",
+        ),
+      ),
+      'result' => "array",
+    ),
+
   ),
 );
