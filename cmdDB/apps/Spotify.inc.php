@@ -82,6 +82,7 @@ $app = array(
           'description' => "Track address",
           'type' => "string",
           'required' => true,
+          'appleScript' => ' "%ARG1%"',
         ),
       ),
       'result' => "bool",
@@ -89,7 +90,7 @@ $app = array(
 
     "setPlayerPosition" => array(
       'description' => "jump to a specific time index of current song",
-      'appleScript' => "set player position to",
+      'appleScript' => "set player position to %ARG1%",
       'arguments' => array(
         '1' => array(
           'description' => "time index",
@@ -102,7 +103,7 @@ $app = array(
 
     "setRepeating" => array(
       'description' => "control repeating",
-      'appleScript' => "set repeating to",
+      'appleScript' => "set repeating to %ARG1%",
       'arguments' => array(
         '1' => array(
           'description' => "turn repeating on or off",
@@ -115,7 +116,7 @@ $app = array(
 
     "setShuffling" => array(
       'description' => "control shuffling",
-      'appleScript' => "set shuffling to",
+      'appleScript' => "set shuffling to %ARG1%",
       'arguments' => array(
         '1' => array(
           'description' => "turn repeating on or off",
