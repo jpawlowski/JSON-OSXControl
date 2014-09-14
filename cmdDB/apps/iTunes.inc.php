@@ -149,6 +149,20 @@ $app = array(
       'result' => "bool",
     ),
 
+    "setPlaylist" => array(
+      'description' => "Play specific playlist",
+      'appleScript' => 'play playlist',
+      'arguments' => array(
+        '1' => array(
+          'description' => "Playlist name",
+          'type' => "string",
+          'required' => true,
+          'appleScript' => " named \"%ARG1%\"",
+        ),
+      ),
+      'result' => "bool",
+    ),
+
     "volumeUp" => array(
       'description' => "Turn volume up by 5%",
       'appleScript' => "set sound volume to sound volume + 5",
