@@ -81,24 +81,23 @@ exit;
 // app control
 function appControl()
 {
-  if (isset($_GET['command']) && !empty($_GET['command']) ) {
-    if (isset($GLOBALS['commandDatabase']['apps'][ $_GET['app'] ])) {
-      $app = $GLOBALS['commandDatabase']['apps'][ $_GET['app'] ];
-    } else {
-      $app['name'] = $_GET['app'];
-    }
-    $command = $_GET['command'];
+  if (isset($GLOBALS['commandDatabase']['apps'][ $_GET['app'] ])) {
+    $app = $GLOBALS['commandDatabase']['apps'][ $_GET['app'] ];
+  } else {
+    $app['name'] = $_GET['app'];
+  }
 
-    if (isset($app['commands'])) {
-      foreach ($app['commands'] as $key => $line) {
-        $definedCmds[$key]['description'] = $line['description'];
-        $definedCmds[$key]['result'] = $line['result'];
-      }
-    }
-    foreach ($GLOBALS['commandDatabase']['commands'] as $key => $line) {
+  if (isset($app['commands'])) {
+    foreach ($app['commands'] as $key => $line) {
       $definedCmds[$key]['description'] = $line['description'];
-      $definedCmds[$key]['result'] = $line['result'];
     }
+  }
+  foreach ($GLOBALS['commandDatabase']['commands'] as $key => $line) {
+    $definedCmds[$key]['description'] = $line['description'];
+  }
+
+  if (isset($_GET['command']) && !empty($_GET['command']) ) {
+    $command = $_GET['command'];
 
     if (isset($app['commands'][$command])) {
       $cmd = $app['commands'][$command];
