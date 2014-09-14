@@ -1,7 +1,7 @@
 <?php
 /*****************************************************************************
 *
-*     airfoil.inc.php
+*     Airfoil.inc.php
 *     Apple Script definition file for OSXControl
 *
 *     Copyright by Julian Pawlowski

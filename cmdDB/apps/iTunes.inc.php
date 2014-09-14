@@ -1,7 +1,7 @@
 <?php
 /*****************************************************************************
 *
-*     itunes.inc.php
+*     iTunes.inc.php
 *     Apple Script definition file for OSXControl
 *
 *     Copyright by Julian Pawlowski

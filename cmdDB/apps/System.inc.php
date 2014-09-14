@@ -1,7 +1,7 @@
 <?php
 /*****************************************************************************
 *
-*     system.inc.php
+*     System.inc.php
 *     Apple Script definition file for OSXControl
 *
 *     Copyright by Julian Pawlowski

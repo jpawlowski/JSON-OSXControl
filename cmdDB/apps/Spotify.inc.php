@@ -1,7 +1,7 @@
 <?php
 /*****************************************************************************
 *
-*     spotify.inc.php
+*     Spotify.inc.php
 *     Apple Script definition file for OSXControl
 *
 *     Copyright by Julian Pawlowski
