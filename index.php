@@ -197,7 +197,7 @@ function appControl()
 
     if ($resultCode > 0) {
       $result = "OSASCRIPT_ERROR";
-      $msg = $resultText[0] . " (" . $osaCmd . ")";
+      $msg = $resultText[0] . " [" . $osaCmd . "]";
       $value = false;
     } else {
       $result = "SUCCESS";
