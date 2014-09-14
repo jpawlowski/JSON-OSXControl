@@ -193,11 +193,11 @@ function appControl()
     // execute osascript
     //
 
-    exec($osaCmd, $resultText, $resultCode);
+    exec($osaCmd . " 2>&1", $resultText, $resultCode);
 
     if ($resultCode > 0) {
       $result = "OSASCRIPT_ERROR";
-      $msg = $osaCmd;
+      $msg = $resultText[0] . " (" . $osaCmd . ")";
       $value = false;
     } else {
       $result = "SUCCESS";
