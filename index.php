@@ -29,13 +29,7 @@ $output = array(
   );
 
 if (isset($_GET['app']) && !empty($_GET['app']) ) {
-
-  if (is_array( $commandDatabase['apps'][ $_GET['app'] ] )) {
-    $output = appControl();
-  } else {
-    $output['result'] = "NOT_IMPLEMENTED";
-    $output['msg'] = "Control of application '".$_GET['app']."' is not implemented.";
-  }
+  $output = appControl();
 } else {
   $output['result'] = "MISSING_APPLICATION_NAME";
   $output['msg'] = "Please specify an application to control.";
@@ -58,12 +52,18 @@ exit;
 function appControl()
 {
   if (isset($_GET['command']) && !empty($_GET['command']) ) {
-    $app = $GLOBALS['commandDatabase']['apps'][ $_GET['app'] ];
+    if (isset($GLOBALS['commandDatabase']['apps'][ $_GET['app'] ])) {
+      $app = $GLOBALS['commandDatabase']['apps'][ $_GET['app'] ];
+    } else {
+      $app['name'] = $_GET['app'];
+    }
     $command = $_GET['command'];
 
-    foreach ($app['commands'] as $key => $line) {
-      $definedCmds[$key]['description'] = $line['description'];
-      $definedCmds[$key]['result'] = $line['result'];
+    if (isset($app['commands'])) {
+      foreach ($app['commands'] as $key => $line) {
+        $definedCmds[$key]['description'] = $line['description'];
+        $definedCmds[$key]['result'] = $line['result'];
+      }
     }
     foreach ($GLOBALS['commandDatabase']['commands'] as $key => $line) {
       $definedCmds[$key]['description'] = $line['description'];
@@ -86,21 +86,89 @@ function appControl()
 
     }
 
-    if (is_array($cmd['appleScript'])) {
+    // Checking for required arguments
+    if (is_array($cmd['arguments'])) {
+      foreach ($cmd['arguments'] as $argNr => $arg) {
+        if ($cmd['arguments'][$argNr]['required'] == true AND !isset($_GET['arg'.$argNr])) {
+          return array(
+            'app' => $_GET['app'],
+            'command' => $_GET['command'],
+            'result' => "MISSING_ARGUMENT",
+            'msg' => "Argument $argNr \"".$cmd['arguments'][$argNr]['description']."\" is required but was not provided.",
+            'value' => false,
+          );
+        }
+      }
+    }
+
+    // generate osascript command
+    //
+
+    // add "tell app" as default if command does not handle it
+    if (isset($cmd['type']) AND $cmd['type'] == "standalone") {
+      $osaCmd = "osascript";
+    } else {
       $osaCmd = "osascript -e 'tell app \"" . $app['name'] . "\"'";
+    }
+
+    // loop through the Apple Script lines if command uses array
+    if (is_array($cmd['appleScript'])) {
       foreach ($cmd['appleScript'] as $key => $line) {
         $osaCmd .= " -e '$line'";
       }
-      $osaCmd .= " -e 'end tell'";
+
+    // add single line Apple Script command if command does not use array
     } else {
-      $osaCmd = "osascript -e 'tell app \"" . $app['name'] . "\" to " . $cmd['appleScript'] . "'";
+      $osaCmd .= " -e '" . $cmd['appleScript'];
     }
+
+    // add Apple Script from arguments
+    if (is_array($cmd['arguments'])) {
+      foreach ($cmd['arguments'] as $argNr => $arg) {
+        if (isset($_GET['arg'.$argNr]) AND !empty($_GET['arg'.$argNr])) {
+
+          // loop through the Apple Script lines if command uses array
+          if (is_array($cmd['arguments'][$argNr]['appleScript'])) {
+            foreach ($cmd['arguments'][$argNr]['appleScript'] as $key => $line) {
+              $osaCmd .= " -e '$line'";
+            }
+
+          // add single line Apple Script command if command does not use array
+          } else {
+            $osaCmd .= $cmd['arguments'][$argNr]['appleScript'];
+          }
+
+        }
+      }
+    }
+
+    if (!is_array($cmd['appleScript'])) {
+      $osaCmd .= "'";
+    }
+
+    // add "end tell" as default if command does not handle it
+    if (!isset($cmd['type']) OR $cmd['type'] != "standalone") {
+      $osaCmd .= " -e 'end tell'";
+    }
+
+    // replace placeholders
+    $osaCmd = str_replace('%APP%', $app['name'], $osaCmd);
+    if (is_array($cmd['arguments'])) {
+      foreach ($cmd['arguments'] as $argNr => $arg) {
+        if (isset($_GET['arg'.$argNr]) AND !empty($_GET['arg'.$argNr])) {
+          $osaCmd = str_replace('%ARG'.$argNr.'%', $_GET['arg'.$argNr], $osaCmd);
+        }
+      }
+    }
+
+    // execute osascript
+    //
 
     exec($osaCmd, $resultText, $resultCode);
 
     if ($resultCode > 0) {
-      $result = "ERROR";
-      $msg = $resultText;
+      $result = "OSASCRIPT_ERROR";
+      $msg = $osaCmd." -> ".$resultText[0];
       $value = false;
     } else {
       $result = "SUCCESS";

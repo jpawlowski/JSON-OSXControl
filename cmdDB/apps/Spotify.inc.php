@@ -1,7 +1,7 @@
 <?php
 /*****************************************************************************
 *
-*     Spotify.inc.php
+*     spotify.inc.php
 *     Apple Script definition file for OSXControl
 *
 *     Copyright by Julian Pawlowski
@@ -46,12 +46,6 @@ $app = array(
         'end if',
       ),
       'result' => "array",
-    ),
-
-    'getVersion' => array(
-      'description' => "Version of this application",
-      'appleScript' => 'version',
-      'result' => "string",
     ),
 
     'getFrontmost' => array(
@@ -164,7 +158,7 @@ $app = array(
 
     "setVolume" => array(
       'description' => "Set volume tp specific level",
-      'appleScript' => "set sound volume to",
+      'appleScript' => "set sound volume to %ARG1%",
       'arguments' => array(
         '1' => array(
           'description' => "Volume in percent",

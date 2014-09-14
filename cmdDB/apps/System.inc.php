@@ -1,7 +1,7 @@
 <?php
 /*****************************************************************************
 *
-*     iTunes.inc.php
+*     system.inc.php
 *     Apple Script definition file for OSXControl
 *
 *     Copyright by Julian Pawlowski
@@ -36,6 +36,12 @@ $app = array(
   'description' => "controls Mac OS X",
   'commands' => array(
 
+    'beep' => array(
+      'description' => "Beeps one or more times.",
+      'appleScript' => 'beep',
+      'result' => "bool",
+    ),
+
     'restart' => array(
       'description' => "Restart Mac",
       'appleScript' => "restart",
@@ -62,12 +68,44 @@ $app = array(
 
     'displayDialog' => array(
       'description' => "Displays system dialog message",
-      'appleScript' => "display dialog",
+      'appleScript' => "display dialog \"%ARG1%\"",
       'arguments' => array(
         '1' => array(
           'description' => "Message text",
           'type' => "string",
           'required' => true,
+        ),
+      ),
+      'result' => "array",
+    ),
+
+    'displayNotification' => array(
+      'description' => "Displays notification message",
+      'appleScript' => "display notification",
+      'arguments' => array(
+        '1' => array(
+          'description' => "Message text",
+          'type' => "string",
+          'required' => true,
+          'appleScript' => " \"%ARG1%\"",
+        ),
+        '2' => array(
+          'description' => "Title text",
+          'type' => "string",
+          'required' => false,
+          'appleScript' => " with title \"%ARG2%\"",
+        ),
+        '3' => array(
+          'description' => "Subtitle text",
+          'type' => "string",
+          'required' => false,
+          'appleScript' => " subtitle \"%ARG3%\"",
+        ),
+        '4' => array(
+          'description' => "Sound name",
+          'type' => "string",
+          'required' => false,
+          'appleScript' => "with sound name \"%ARG4%\"",
         ),
       ),
       'result' => "array",
