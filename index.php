@@ -30,6 +30,20 @@
 *
 *****************************************************************************/
 
+// Handle URI as GET/REQUEST input
+$URI = explode('/', substr( parse_url($_SERVER['REQUEST_URI'] )['path'], strlen(dirname($_SERVER['PHP_SELF'])) + 1));
+if (!empty($URI[0])) {
+  foreach ($URI as $key => $item) {
+    if ($key % 2 != 0)
+      continue;
+
+    if (isset($URI[$key]) AND isset($URI[$key+1]) AND !empty($URI[$key]) AND !empty($URI[$key+1])) {
+      $_GET[$URI[$key]] = $URI[$key+1];
+      $_REQUEST[$URI[$key]] = $URI[$key+1];
+    }
+  }
+}
+
 // Load general Apple Script commands
 include_once(dirname(__FILE__).'/cmdDB/generic.inc.php');
 $commandDatabase['commands'] = $generic;
