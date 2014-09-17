@@ -44,6 +44,11 @@ if (!empty($URI[0])) {
   }
 }
 
+// Handle POST[json] as REQUEST input
+if (isset($_POST['json']) AND !empty($_POST['json'])) {
+  $_REQUEST = array_merge($_REQUEST, json_decode($_POST['json'], true));
+}
+
 // Load general Apple Script commands
 include_once(dirname(__FILE__).'/cmdDB/generic.inc.php');
 $commandDatabase['commands'] = $generic;
@@ -64,15 +69,15 @@ foreach ($commandDatabase['apps'] as $key => $line) {
 
 # default output data
 $output = array(
-    'app' => $_GET['app'],
-    'command' => $_GET['command'],
+    'app' => $_REQUEST['app'],
+    'command' => $_REQUEST['command'],
     'result' => "FATAL_ERROR",
     'msg' => "INDEFINED_ERROR_HANDLING",
     'value' => false,
     'apps' => $definedApps,
   );
 
-if (isset($_GET['app']) && !empty($_GET['app']) ) {
+if (isset($_REQUEST['app']) && !empty($_REQUEST['app']) ) {
   $output = appControl();
 } else {
   $output['result'] = "MISSING_APPLICATION_NAME";
@@ -84,8 +89,8 @@ if (isset($output)) {
   header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 3600));
   header('Content-type: application/json');
 
-  if (isset($_GET['jsoncallback'])) {
-    echo $_GET['jsoncallback'] . '('. json_encode($output) . ')';
+  if (isset($_REQUEST['jsoncallback'])) {
+    echo $_REQUEST['jsoncallback'] . '('. json_encode($output) . ')';
   } else {
     echo json_encode($output);
   }
@@ -95,10 +100,10 @@ exit;
 // app control
 function appControl()
 {
-  if (isset($GLOBALS['commandDatabase']['apps'][ $_GET['app'] ])) {
-    $app = $GLOBALS['commandDatabase']['apps'][ $_GET['app'] ];
+  if (isset($GLOBALS['commandDatabase']['apps'][ $_REQUEST['app'] ])) {
+    $app = $GLOBALS['commandDatabase']['apps'][ $_REQUEST['app'] ];
   } else {
-    $app['name'] = $_GET['app'];
+    $app['name'] = $_REQUEST['app'];
   }
 
   if (isset($app['commands'])) {
@@ -110,8 +115,8 @@ function appControl()
     $definedCmds[$key]['description'] = $line['description'];
   }
 
-  if (isset($_GET['command']) && !empty($_GET['command']) ) {
-    $command = $_GET['command'];
+  if (isset($_REQUEST['command']) && !empty($_REQUEST['command']) ) {
+    $command = $_REQUEST['command'];
 
     if (isset($app['commands'][$command])) {
       $cmd = $app['commands'][$command];
@@ -119,8 +124,8 @@ function appControl()
       $cmd = $GLOBALS['commandDatabase']['commands'][$command];
     } else {
       return array(
-        'app' => $_GET['app'],
-        'command' => $_GET['command'],
+        'app' => $_REQUEST['app'],
+        'command' => $_REQUEST['command'],
         'result' => "INVALID_COMMAND",
         'msg' => "This is an invalid command to control this application.",
         'value' => false,
@@ -132,10 +137,10 @@ function appControl()
     // Checking for required arguments
     if (is_array($cmd['arguments'])) {
       foreach ($cmd['arguments'] as $argNr => $arg) {
-        if ($cmd['arguments'][$argNr]['required'] == true AND !isset($_GET['arg'.$argNr])) {
+        if ($cmd['arguments'][$argNr]['required'] == true AND !isset($_REQUEST['arg'.$argNr])) {
           return array(
-            'app' => $_GET['app'],
-            'command' => $_GET['command'],
+            'app' => $_REQUEST['app'],
+            'command' => $_REQUEST['command'],
             'result' => "MISSING_ARGUMENT",
             'msg' => "Argument $argNr \"".$cmd['arguments'][$argNr]['description']."\" is required but was not provided.",
             'value' => false,
@@ -168,7 +173,7 @@ function appControl()
     // add Apple Script from arguments
     if (is_array($cmd['arguments'])) {
       foreach ($cmd['arguments'] as $argNr => $arg) {
-        if (isset($_GET['arg'.$argNr]) AND !empty($_GET['arg'.$argNr])) {
+        if (isset($_REQUEST['arg'.$argNr]) AND !empty($_REQUEST['arg'.$argNr])) {
 
           // loop through the Apple Script lines if command uses array
           if (is_array($cmd['arguments'][$argNr]['appleScript'])) {
@@ -198,8 +203,8 @@ function appControl()
     $osaCmd = str_replace('%APP%', $app['name'], $osaCmd);
     if (is_array($cmd['arguments'])) {
       foreach ($cmd['arguments'] as $argNr => $arg) {
-        if (isset($_GET['arg'.$argNr]) AND !empty($_GET['arg'.$argNr])) {
-          $osaCmd = str_replace('%ARG'.$argNr.'%', $_GET['arg'.$argNr], $osaCmd);
+        if (isset($_REQUEST['arg'.$argNr]) AND !empty($_REQUEST['arg'.$argNr])) {
+          $osaCmd = str_replace('%ARG'.$argNr.'%', $_REQUEST['arg'.$argNr], $osaCmd);
         }
       }
     }
@@ -259,8 +264,8 @@ function appControl()
     };
 
     return array(
-      'app' => $_GET['app'],
-      'command' => $_GET['command'],
+      'app' => $_REQUEST['app'],
+      'command' => $_REQUEST['command'],
       'result' => $result,
       'msg' => $msg,
       'value' => $value,
@@ -268,8 +273,8 @@ function appControl()
 
   } else {
       return array(
-        'app' => $_GET['app'],
-        'command' => $_GET['command'],
+        'app' => $_REQUEST['app'],
+        'command' => $_REQUEST['command'],
         'result' => "MISSING_COMMAND_NAME",
         'msg' => "Please specify a command.",
         'commands' => $definedCmds,
