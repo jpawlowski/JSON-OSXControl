@@ -44,9 +44,12 @@ if (!empty($URI[0])) {
   }
 }
 
-// Handle POST[json] as REQUEST input
-if (isset($_POST['json']) AND !empty($_POST['json'])) {
+// Handle POST[json] or JSON-POST as REQUEST input
+if (isset($_POST['json']) AND !empty($_POST['json']) AND preg_match('/^{.*}$/', $_POST['json'])) {
   $_REQUEST = array_merge($_REQUEST, json_decode($_POST['json'], true));
+} elseif (isset($GLOBALS['HTTP_RAW_POST_DATA']) AND !empty($GLOBALS['HTTP_RAW_POST_DATA']) AND preg_match('/^{.*}$/', $GLOBALS['HTTP_RAW_POST_DATA'])) {
+  $_POST = json_decode($GLOBALS['HTTP_RAW_POST_DATA'], true);
+  $_REQUEST = array_merge($_REQUEST, $_POST);
 }
 
 // Load general Apple Script commands
@@ -87,12 +90,13 @@ if (isset($_REQUEST['app']) && !empty($_REQUEST['app']) ) {
 if (isset($output)) {
   header('Cache-Control: no-cache, must-revalidate');
   header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 3600));
-  header('Content-type: application/json');
 
   if (isset($_REQUEST['jsoncallback'])) {
-    echo $_REQUEST['jsoncallback'] . '('. json_encode($output) . ')';
+    header('Content-type: application/javascript');
+    echo $_REQUEST['jsoncallback'] . '(['. json_encode($output) . '])';
   } else {
-    echo json_encode($output);
+    header('Content-type: application/json');
+    echo "[".json_encode($output)."]";
   }
 };
 exit;
