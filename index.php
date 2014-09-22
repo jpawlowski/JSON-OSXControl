@@ -33,6 +33,11 @@
 // Handle URI as GET/REQUEST input
 $URI = explode('/', substr( parse_url($_SERVER['REQUEST_URI'] )['path'], strlen(dirname($_SERVER['PHP_SELF'])) + 1));
 if (!empty($URI[0])) {
+  if (!in_array($URI[0], array("app", "command", "arg1", "arg2", "arg3",
+      "arg4", "arg5", "arg6", "arg7", "arg8", "arg9", "arg10"))) {
+    $auth_token = array_shift($URI);
+  }
+
   foreach ($URI as $key => $item) {
     if ($key % 2 != 0)
       continue;
@@ -42,6 +47,19 @@ if (!empty($URI[0])) {
       $_REQUEST[$URI[$key]] = $URI[$key+1];
     }
   }
+}
+
+// Load user tokens
+include_once(dirname(__FILE__).'/users.inc.php');
+
+// Security check
+if (!isset($auth_token) AND !isset($users[$auth_token])) {
+  header('Cache-Control: no-cache, must-revalidate');
+  header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 3600));
+  header('Content-type: application/json');
+
+  echo '[{"app":null,"command":null, "msg":"Authentication failed", "result":"UNAUTHORIZED"}]';
+  exit;
 }
 
 // Handle POST[json] or JSON-POST as REQUEST input
