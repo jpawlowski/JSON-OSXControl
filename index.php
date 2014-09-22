@@ -154,9 +154,9 @@ function appControl()
 
     // add "tell app" as default if command does not handle it
     if (isset($cmd['type']) AND $cmd['type'] == "standalone") {
-      $osaCmd = "osascript";
+      $osaCmd = "sudo osascript";
     } else {
-      $osaCmd = "osascript -e 'tell app \"" . $app['name'] . "\"'";
+      $osaCmd = "sudo osascript -e 'tell app \"" . $app['name'] . "\"'";
     }
 
     // loop through the Apple Script lines if command uses array

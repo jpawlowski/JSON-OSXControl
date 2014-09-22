@@ -5,6 +5,11 @@ These php scripts provide JSON REST API to control any OSX application supportin
 
 ## Installation
 Just put these files into the Mac's htdocs directory running Apache or Nginx with PHP.
+The web server service account needs to be allowed to run osascript via sudo. Add an entry via 'sudo visudo' like this:
+
+````
+username ALL=NOPASSWD: /usr/bin/osascript
+````
 
 
 ## Prerequisites
