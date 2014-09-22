@@ -72,7 +72,7 @@ $output = array(
     'app' => $_REQUEST['app'],
     'command' => $_REQUEST['command'],
     'result' => "FATAL_ERROR",
-    'msg' => "INDEFINED_ERROR_HANDLING",
+    'msg' => "UNDEFINED_ERROR_HANDLING",
     'value' => false,
     'apps' => $definedApps,
   );
