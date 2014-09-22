@@ -53,7 +53,7 @@ if (!empty($URI[0])) {
 include_once(dirname(__FILE__).'/users.inc.php');
 
 // Security check
-if (!isset($auth_token) OR !isset($users[$auth_token])) {
+if (!isset($auth_token) OR !in_array($auth_token, $users)) {
   header('Cache-Control: no-cache, must-revalidate');
   header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 3600));
   header('Content-type: application/json');
