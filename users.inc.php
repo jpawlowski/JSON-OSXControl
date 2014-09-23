@@ -7,5 +7,5 @@
 *****************************************************************************/
 
 $users = array(
-  'ChangeThisAuthTokenBeforeUse',
+  'default' => 'ChangeThisAuthTokenBeforeUse',
 );
