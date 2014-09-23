@@ -142,7 +142,7 @@ $app = array(
           'description' => "Sound name",
           'type' => "string",
           'required' => false,
-          'appleScript' => "with sound name \"%ARG4%\"",
+          'appleScript' => " with sound name \"%ARG4%\"",
         ),
       ),
       'result' => "array",
