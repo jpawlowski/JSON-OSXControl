@@ -28,8 +28,24 @@ username ALL=NOPASSWD: /usr/bin/osascript
 
 ## Security
 
+#### Transport encryption
+
 It is recommended to enable SSL/TLS encryption for the web server and only allow encrypted access to the JSON OSX Control scripts.
-Please also edit users.inc.php for your individual access tokens and delete the example token. This file is out of scope for the Git pull update mechanism and will never be overwritten automatically.
+
+#### Authentication tokens
+
+Please create a file named users.inc.php for your individual access tokens; the default token `ChangeThisAuthTokenBeforeUse` will be replaced by them. This file is out of scope for the Git pull update mechanism and will never be overwritten automatically.
+The file content needs to be like this:
+
+````
+$users = array(
+  'default' => 'ChangeThisAuthTokenBeforeUse',
+);
+````
+
+You may add as many tokens as you like. Using one token per remote device is recommended.
+
+#### Web server security
 
 If possible, configure your web server to run under a dedicated service user account `www` (in case of MAMP) or `_www` (in case of older OS X versions providing their own web server). Update your sudo configuration accordingly.
 
