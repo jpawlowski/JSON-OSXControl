@@ -163,7 +163,7 @@ function appControl()
     }
 
     // Checking for required arguments
-    if (is_array($cmd['arguments'])) {
+    if (isset($cmd['arguments']) AND is_array($cmd['arguments'])) {
       foreach ($cmd['arguments'] as $argNr => $arg) {
         if ($cmd['arguments'][$argNr]['required'] == true AND !isset($_REQUEST['arg'.$argNr])) {
           return array(
@@ -201,18 +201,18 @@ function appControl()
       }
 
       // add Apple Script from arguments
-      if (is_array($cmd['arguments'])) {
+      if (isset($cmd['arguments']) AND is_array($cmd['arguments'])) {
         foreach ($cmd['arguments'] as $argNr => $arg) {
           if (isset($_REQUEST['arg'.$argNr]) AND !empty($_REQUEST['arg'.$argNr])) {
 
             // loop through the Apple Script lines if command uses array
-            if (is_array($cmd['arguments'][$argNr]['appleScript'])) {
+            if (isset($cmd['arguments'][$argNr]['appleScript']) AND is_array($cmd['arguments'][$argNr]['appleScript'])) {
               foreach ($cmd['arguments'][$argNr]['appleScript'] as $key => $line) {
                 $osaCmd .= " -e '$line'";
               }
 
             // add single line Apple Script command if command does not use array
-            } else {
+            } elseif(isset($cmd['arguments'][$argNr]['appleScript'])) {
               $osaCmd .= $cmd['arguments'][$argNr]['appleScript'];
             }
 
@@ -231,7 +231,7 @@ function appControl()
 
       // replace placeholders
       $osaCmd = str_replace('%APP%', $app['name'], $osaCmd);
-      if (is_array($cmd['arguments'])) {
+      if (isset($cmd['arguments']) && is_array($cmd['arguments'])) {
         foreach ($cmd['arguments'] as $argNr => $arg) {
           if (isset($_REQUEST['arg'.$argNr]) AND !empty($_REQUEST['arg'.$argNr])) {
             $osaCmd = str_replace('%ARG'.$argNr.'%', $_REQUEST['arg'.$argNr], $osaCmd);
