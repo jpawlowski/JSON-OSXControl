@@ -50,10 +50,14 @@ if (!empty($URI[0])) {
 }
 
 // Load user tokens
-include_once(dirname(__FILE__).'/users.inc.php');
+if(file_exists(dirname(__FILE__).'/users.inc.php')) {
+  include_once(dirname(__FILE__).'/users.inc.php');
+} else {
+  $users = array("ChangeThisAuthTokenBeforeUse");
+}
 
 // Security check
-if (!isset($auth_token) OR !in_array($auth_token, $users)) {
+if (!isset($auth_token) OR !isset($users) OR !is_array($users) OR !in_array($auth_token, $users)) {
   header('Cache-Control: no-cache, must-revalidate');
   header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + 3600));
   header('Content-type: application/json');
