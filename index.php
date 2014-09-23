@@ -71,8 +71,10 @@ if (isset($_POST['json']) AND !empty($_POST['json']) AND preg_match('/^{.*}$/', 
 }
 
 // Load general Apple Script commands
-include_once(dirname(__FILE__).'/cmdDB/generic.inc.php');
-$commandDatabase['commands'] = $generic;
+if (isset($_REQUEST['app']) AND $_REQUEST['app'] != "self") {
+  include_once(dirname(__FILE__).'/cmdDB/generic.inc.php');
+  $commandDatabase['commands'] = $generic;
+}
 
 # Load Application specific commands
 $appConfs = glob(dirname(__FILE__).'/cmdDB/apps/*.inc.php', GLOB_BRACE);
@@ -174,124 +176,208 @@ function appControl()
     // generate osascript command
     //
 
-    // add "tell app" as default if command does not handle it
-    if (isset($cmd['type']) AND $cmd['type'] == "standalone") {
-      $osaCmd = "sudo /usr/bin/osascript";
-    } else {
-      $osaCmd = "sudo /usr/bin/osascript -e 'tell app \"" . $app['name'] . "\"'";
-    }
+    if (isset($cmd['appleScript'])) {
 
-    // loop through the Apple Script lines if command uses array
-    if (is_array($cmd['appleScript'])) {
-      foreach ($cmd['appleScript'] as $key => $line) {
-        $osaCmd .= " -e '$line'";
+      // add "tell app" as default if command does not handle it
+      if (isset($cmd['type']) AND $cmd['type'] == "standalone") {
+        $osaCmd = "sudo /usr/bin/osascript";
+      } else {
+        $osaCmd = "sudo /usr/bin/osascript -e 'tell app \"" . $app['name'] . "\"'";
       }
 
-    // add single line Apple Script command if command does not use array
-    } else {
-      $osaCmd .= " -e '" . $cmd['appleScript'];
-    }
+      // loop through the Apple Script lines if command uses array
+      if (is_array($cmd['appleScript'])) {
+        foreach ($cmd['appleScript'] as $key => $line) {
+          $osaCmd .= " -e '" . $line . "'";
+        }
 
-    // add Apple Script from arguments
-    if (is_array($cmd['arguments'])) {
-      foreach ($cmd['arguments'] as $argNr => $arg) {
-        if (isset($_REQUEST['arg'.$argNr]) AND !empty($_REQUEST['arg'.$argNr])) {
+      // add single line Apple Script command if command does not use array
+      } else {
+        $osaCmd .= " -e '" . $cmd['appleScript'];
+      }
 
-          // loop through the Apple Script lines if command uses array
-          if (is_array($cmd['arguments'][$argNr]['appleScript'])) {
-            foreach ($cmd['arguments'][$argNr]['appleScript'] as $key => $line) {
-              $osaCmd .= " -e '$line'";
+      // add Apple Script from arguments
+      if (is_array($cmd['arguments'])) {
+        foreach ($cmd['arguments'] as $argNr => $arg) {
+          if (isset($_REQUEST['arg'.$argNr]) AND !empty($_REQUEST['arg'.$argNr])) {
+
+            // loop through the Apple Script lines if command uses array
+            if (is_array($cmd['arguments'][$argNr]['appleScript'])) {
+              foreach ($cmd['arguments'][$argNr]['appleScript'] as $key => $line) {
+                $osaCmd .= " -e '$line'";
+              }
+
+            // add single line Apple Script command if command does not use array
+            } else {
+              $osaCmd .= $cmd['arguments'][$argNr]['appleScript'];
             }
 
-          // add single line Apple Script command if command does not use array
+          }
+        }
+      }
+
+      if (!is_array($cmd['appleScript'])) {
+        $osaCmd .= "'";
+      }
+
+      // add "end tell" as default if command does not handle it
+      if (!isset($cmd['type']) OR $cmd['type'] != "standalone") {
+        $osaCmd .= " -e 'end tell'";
+      }
+
+      // replace placeholders
+      $osaCmd = str_replace('%APP%', $app['name'], $osaCmd);
+      if (is_array($cmd['arguments'])) {
+        foreach ($cmd['arguments'] as $argNr => $arg) {
+          if (isset($_REQUEST['arg'.$argNr]) AND !empty($_REQUEST['arg'.$argNr])) {
+            $osaCmd = str_replace('%ARG'.$argNr.'%', $_REQUEST['arg'.$argNr], $osaCmd);
+          }
+        }
+      }
+
+      // execute osascript
+      //
+
+      exec($osaCmd . " 2>&1", $resultText, $resultCode);
+
+      if ($resultCode > 0) {
+        $result = "OSASCRIPT_ERROR";
+        $msg = $resultText[0] . " [" . $osaCmd . "]";
+        $value = false;
+      } else {
+        $result = "SUCCESS";
+        $msg = null;
+
+        if ($cmd['result'] == "array" OR $cmd['result'] == "string") {
+          # special handling for date fields
+          $resultText = preg_replace("/:(date\ )([A-Z]\w+)(,\ )([0-9]+\.\ )/", ":$2\\,,$4", $resultText[0]);
+
+          # special handling for data fields
+          $resultText = preg_replace("/(«data )(.*)(»)/", "$2", $resultText);
+
+          if ($cmd['result'] == "array") {
+            # create Array
+            $resArray = explode(', ', $resultText);
+
+            foreach ($resArray as $key => $line) {
+              $lineKey = preg_replace("/(.*?):(.*)/", "$1", $line);
+              $lineValue = preg_replace("/(.*?):(.*)/", "$2", $line);
+
+              # correct date fields
+              $lineValue = preg_replace("/(\\\,,)/", ", ", $lineValue);
+
+              # handle missing values as being nil
+              if ($lineValue == "missing value") {
+                $lineValue = null;
+              }
+
+              if (!empty($lineKey) AND $lineKey != "class") {
+                $converted[$lineKey] = $lineValue;
+              }
+            }
           } else {
-            $osaCmd .= $cmd['arguments'][$argNr]['appleScript'];
+            $converted = $resultText;
           }
 
+          if (empty($converted)) {
+            $value = true;
+          } else {
+            $value = $converted;
+          }
+        } else {
+          $value = true;
         }
-      }
+      };
+
+      return array(
+        'app' => $_REQUEST['app'],
+        'command' => $_REQUEST['command'],
+        'result' => $result,
+        'msg' => $msg,
+        'value' => $value,
+      );
     }
 
-    if (!is_array($cmd['appleScript'])) {
-      $osaCmd .= "'";
-    }
-
-    // add "end tell" as default if command does not handle it
-    if (!isset($cmd['type']) OR $cmd['type'] != "standalone") {
-      $osaCmd .= " -e 'end tell'";
-    }
-
-    // replace placeholders
-    $osaCmd = str_replace('%APP%', $app['name'], $osaCmd);
-    if (is_array($cmd['arguments'])) {
-      foreach ($cmd['arguments'] as $argNr => $arg) {
-        if (isset($_REQUEST['arg'.$argNr]) AND !empty($_REQUEST['arg'.$argNr])) {
-          $osaCmd = str_replace('%ARG'.$argNr.'%', $_REQUEST['arg'.$argNr], $osaCmd);
-        }
-      }
-    }
-
-    // execute osascript
+    // generate shellscript command
     //
 
-    exec($osaCmd . " 2>&1", $resultText, $resultCode);
+    elseif (isset($cmd['shellScript'])) {
 
-    if ($resultCode > 0) {
-      $result = "OSASCRIPT_ERROR";
-      $msg = $resultText[0] . " [" . $osaCmd . "]";
-      $value = false;
-    } else {
-      $result = "SUCCESS";
-      $msg = null;
-
-      if ($cmd['result'] == "array" OR $cmd['result'] == "string") {
-        # special handling for date fields
-        $resultText = preg_replace("/:(date\ )([A-Z]\w+)(,\ )([0-9]+\.\ )/", ":$2\\,,$4", $resultText[0]);
-
-        # special handling for data fields
-        $resultText = preg_replace("/(«data )(.*)(»)/", "$2", $resultText);
-
-        if ($cmd['result'] == "array") {
-          # create Array
-          $resArray = explode(', ', $resultText);
-
-          foreach ($resArray as $key => $line) {
-            $lineKey = preg_replace("/(.*?):(.*)/", "$1", $line);
-            $lineValue = preg_replace("/(.*?):(.*)/", "$2", $line);
-
-            # correct date fields
-            $lineValue = preg_replace("/(\\\,,)/", ", ", $lineValue);
-
-            # handle missing values as being nil
-            if ($lineValue == "missing value") {
-              $lineValue = null;
-            }
-
-            if (!empty($lineKey) AND $lineKey != "class") {
-              $converted[$lineKey] = $lineValue;
-            }
-          }
-        } else {
-          $converted = $resultText;
+      // loop through the script lines if command uses array
+      if (is_array($cmd['shellScript'])) {
+        foreach ($cmd['shellScript'] as $key => $line) {
+          $shCmd .= " " . $line;
         }
 
-        if (empty($converted)) {
-          $value = true;
-        } else {
-          $value = $converted;
-        }
+      // add single line Apple Script command if command does not use array
       } else {
-        $value = true;
+        $shCmd .= " " . $cmd['shellScript'];
       }
-    };
 
-    return array(
-      'app' => $_REQUEST['app'],
-      'command' => $_REQUEST['command'],
-      'result' => $result,
-      'msg' => $msg,
-      'value' => $value,
-    );
+      // add Apple Script from arguments
+      if (is_array($cmd['arguments'])) {
+        foreach ($cmd['arguments'] as $argNr => $arg) {
+          if (isset($_REQUEST['arg'.$argNr]) AND !empty($_REQUEST['arg'.$argNr])) {
+
+            // loop through the Apple Script lines if command uses array
+            if (is_array($cmd['arguments'][$argNr]['shellScript'])) {
+              foreach ($cmd['arguments'][$argNr]['shellScript'] as $key => $line) {
+                $shCmd .= " " . $line;
+              }
+
+            // add single line Apple Script command if command does not use array
+            } else {
+              $shCmd .= $cmd['arguments'][$argNr]['shellScript'];
+            }
+
+          }
+        }
+      }
+
+      // replace placeholders
+      $shCmd = str_replace('%APP%', $app['name'], $shCmd);
+      if (is_array($cmd['arguments'])) {
+        foreach ($cmd['arguments'] as $argNr => $arg) {
+          if (isset($_REQUEST['arg'.$argNr]) AND !empty($_REQUEST['arg'.$argNr])) {
+            $shCmd = str_replace('%ARG'.$argNr.'%', $_REQUEST['arg'.$argNr], $shCmd);
+          }
+        }
+      }
+
+      // execute shellscript
+      //
+
+      exec($shCmd . " 2>&1", $resultText, $resultCode);
+
+      if ($resultCode > 0) {
+        $result = "SHELLSCRIPT_ERROR";
+        $msg = $resultText[0] . " [" . $shCmd . "]";
+        $value = false;
+      } else {
+        $result = "SUCCESS";
+        $msg = null;
+
+        if ($cmd['result'] == "string") {
+
+          if (empty($resultText)) {
+            $value = true;
+          } else {
+            $value = $resultText;
+          }
+
+        } else {
+          $value = true;
+        }
+      };
+
+      return array(
+        'app' => $_REQUEST['app'],
+        'command' => $_REQUEST['command'],
+        'result' => $result,
+        'msg' => $msg,
+        'value' => $value,
+      );
+    }
 
   } else {
       return array(
