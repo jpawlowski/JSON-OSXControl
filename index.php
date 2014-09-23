@@ -96,8 +96,8 @@ foreach ($commandDatabase['apps'] as $key => $line) {
 
 # default output data
 $output = array(
-    'app' => $_REQUEST['app'],
-    'command' => $_REQUEST['command'],
+    'app' => null,
+    'command' => null,
     'result' => "FATAL_ERROR",
     'msg' => "UNDEFINED_ERROR_HANDLING",
     'value' => false,
@@ -109,6 +109,9 @@ if (isset($_REQUEST['app']) && !empty($_REQUEST['app']) ) {
 } else {
   $output['result'] = "MISSING_APPLICATION_NAME";
   $output['msg'] = "Please specify an application to control.";
+  if (isset($_REQUEST['command'])) {
+    $output['command'] = $_REQUEST['command'];
+  }
 }
 
 if (isset($output)) {
@@ -254,7 +257,11 @@ function appControl()
 
         if ($cmd['result'] == "array" OR $cmd['result'] == "string") {
           # special handling for date fields
-          $resultText = preg_replace("/:(date\ )([A-Z]\w+)(,\ )([0-9]+\.\ )/", ":$2\\,,$4", $resultText[0]);
+          if (!empty($resultText[0])) {
+            $resultText = preg_replace("/:(date\ )([A-Z]\w+)(,\ )([0-9]+\.\ )/", ":$2\\,,$4", $resultText[0]);
+          } else {
+            $resultText = "";
+          }
 
           # special handling for data fields
           $resultText = preg_replace("/(«data )(.*)(»)/", "$2", $resultText);
@@ -386,7 +393,7 @@ function appControl()
   } else {
       return array(
         'app' => $_REQUEST['app'],
-        'command' => $_REQUEST['command'],
+        'command' => null,
         'result' => "MISSING_COMMAND_NAME",
         'msg' => "Please specify a command.",
         'commands' => $definedCmds,
