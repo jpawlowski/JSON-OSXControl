@@ -34,7 +34,7 @@ It is recommended to enable SSL/TLS encryption for the web server and only allow
 
 #### Authentication tokens
 
-Please create a file named users.inc.php for your individual access tokens; the default token `ChangeThisAuthTokenBeforeUse` will be replaced by them. This file is out of scope for the Git pull update mechanism and will never be overwritten automatically.
+Please create a file named users.inc.php for your individual access tokens; the default token `CreateFile-users.inc.php-BeforeUse` will be replaced by them. This file is out of scope for the Git pull update mechanism and will never be overwritten automatically.
 The file content needs to be like this:
 
 ````
