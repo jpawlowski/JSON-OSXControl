@@ -1,5 +1,9 @@
+<FilesMatch "\.(?:inc.php|inc)$">
+Order allow,deny
+Deny from all
+</FilesMatch>
+
 RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule . index.php [L]
-
