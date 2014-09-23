@@ -53,7 +53,7 @@ if (!empty($URI[0])) {
 if(file_exists(dirname(__FILE__).'/users.inc.php')) {
   include_once(dirname(__FILE__).'/users.inc.php');
 } else {
-  $users = array("ChangeThisAuthTokenBeforeUse");
+  $users = array("CreateFile-users.inc.php-BeforeUse");
 }
 
 // Security check

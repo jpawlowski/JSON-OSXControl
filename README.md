@@ -40,7 +40,7 @@ The file content needs to be like this:
 ````
 <?php
 $users = array(
-  'default' => 'ChangeThisAuthTokenBeforeUse',
+  'any user name' => 'thisUsersSecurityTokenString',
 );
 ````
 
