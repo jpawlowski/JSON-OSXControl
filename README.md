@@ -38,6 +38,7 @@ Please create a file named users.inc.php for your individual access tokens; the 
 The file content needs to be like this:
 
 ````
+<?php
 $users = array(
   'default' => 'ChangeThisAuthTokenBeforeUse',
 );
