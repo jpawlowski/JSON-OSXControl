@@ -32,8 +32,8 @@
 *****************************************************************************/
 
 $app = array(
-  'name' => "self",
-  'description' => "controls JSON-OSXControl",
+  'name' => "JSON OSX Control",
+  'description' => "Functions for JSON OSX Control",
   'commands' => array(
 
     'update' => array(
